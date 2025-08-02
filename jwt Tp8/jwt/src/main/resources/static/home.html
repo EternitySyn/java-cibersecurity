@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Menú</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(to right, #2c3e50, #4ca1af);
+            color: white;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-top: 60px;
+        }
+
+        header {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+        }
+
+        #logoutBtn {
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        #logoutBtn:hover {
+            background: white;
+            color: #2c3e50;
+        }
+
+        h1 {
+            font-size: 2.8em;
+            margin-bottom: 0.2em;
+        }
+
+        .subtitulo {
+            letter-spacing: 2px;
+            margin-bottom: 2em;
+            font-size: 1.1em;
+        }
+
+        .progress-bar {
+            width: 300px;
+            height: 10px;
+            background: #ccc;
+            border-radius: 5px;
+            margin: 0 auto 30px;
+            position: relative;
+        }
+
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: #3498db;
+            border-radius: 5px;
+            transition: width 2s;
+        }
+
+        .btn-group > div {
+            margin-bottom: 20px;
+        }
+
+        button {
+            margin: 0 5px;
+            padding: 10px 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.3s;
+        }
+
+        .fetch-btn {
+            background-color: #2980b9;
+            color: white;
+        }
+
+        .fetch-btn:hover {
+            background-color: #1f618d;
+        }
+
+        .add-btn {
+            background-color: #27ae60;
+            color: white;
+        }
+
+        .add-btn:hover {
+            background-color: #1e8449;
+        }
+
+        .delete-btn {
+            background-color: #c0392b;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background-color: #922b21;
+        }
+
+        #results {
+            margin: 30px auto;
+            max-width: 90%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background: white;
+            color: #2c3e50;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #2980b9;
+            color: white;
+        }
+
+        pre {
+            margin: 0;
+            font-family: inherit;
+        }
+
+        .social-icons {
+            margin-top: auto;
+            margin-bottom: 20px;
+        }
+
+        .social-icons a {
+            margin: 0 10px;
+            color: white;
+            text-decoration: none;
+            font-size: 1.5em;
+        }
+
+        footer {
+            font-size: 0.8em;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <button id="logoutBtn">Logout</button>
+</header>
+
+<h1>MENÚ DE <span th:text="${rol}">ROL</span></h1>
+<div class="subtitulo">ELEGIR ACCIÓN A REALIZAR</div>
+
+<div class="progress-bar">
+    <div class="progress-fill" id="progressFill"></div>
+</div>
+
+<div class="btn-group">
+    <div>
+        <button class="employee-btn fetch-btn" data-endpoint="/api/v1/employees">Employee</button>
+        <button class="add-btn" data-role="employee">Add</button>
+        <button class="delete-btn" data-role="employee">Delete</button>
+    </div>
+    <div>
+        <button class="franchise-btn fetch-btn" data-endpoint="/api/v1/franchises">Franchise</button>
+        <button class="add-btn" data-role="franchise">Add</button>
+        <button class="delete-btn" data-role="franchise">Delete</button>
+        <button class="assign-btn">Assign</button>
+    </div>
+    <div>
+        <button class="owner-btn fetch-btn" data-endpoint="/api/v1/owners">Owner</button>
+        <button class="add-btn" data-role="owner">Add</button>
+        <button class="delete-btn" data-role="owner">Delete</button>
+    </div>
+</div>
+
+<div id="results"></div>
+
+<div class="social-icons">
+    <a href="#">🔗</a>
+    <a href="#">💼</a>
+    <a href="#">📷</a>
+    <a href="#">🐦</a>
+</div>
+
+<footer>
+    &copy; 2025 para CFP N°8. Hecho con la ayuda del GPT.
+</footer>
+
+<script>
+    // Simula la carga del progreso (solo efecto visual)
+    window.onload = function () {
+        const fill = document.getElementById('progressFill');
+        setTimeout(() => {
+            fill.style.width = '100%';
+        }, 500);
+    };
+</script>
+
+<!-- Mantén los scripts JS existentes -->
+<!-- (Tu script de JWT y lógica fetch, add, delete, logout) -->
+<script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
+<script>
+  const token = localStorage.getItem('jwtToken');
+  if (!token) {
+    
+  } else {
+    try {
+      const decoded = jwt_decode(token);
+      const now = Date.now() / 1000; // in seconds
+      if (decoded.exp < now) {
+        localStorage.removeItem('jwtToken');
+        window.location.href = '/index.html';
+      }
+    } catch (e) {
+      localStorage.removeItem('jwtToken');
+      window.location.href = '/index.html';
+    }
+  }
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const token = localStorage.getItem('jwtToken');
+  const buttons = document.querySelectorAll('.fetch-btn');
+  const resultsDiv = document.getElementById('results');
+
+  buttons.forEach(button => {
+    button.addEventListener('click', async () => {
+      const endpoint = button.getAttribute('data-endpoint');
+      try {
+        const response = await fetch(endpoint, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status} ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        displayTable(data);
+      } catch (error) {
+        resultsDiv.innerHTML = `<p style="color: red;">${error.message}</p>`;
+      }
+    });
+  });
+
+  function displayTable(data) {
+  if (!Array.isArray(data) || data.length === 0) {
+    resultsDiv.innerHTML = '<p>No data to display.</p>';
+    return;
+  }
+
+  const headers = Object.keys(data[0]);
+  let html = '<table><thead><tr>';
+  headers.forEach(header => {
+    html += `<th>${header}</th>`;
+  });
+  html += '</tr></thead><tbody>';
+
+  data.forEach(row => {
+    html += '<tr>';
+    headers.forEach(header => {
+      let cell = row[header];
+
+      // Si el campo es la lista de franchises
+      if (header === "franchises" && Array.isArray(cell)) {
+        const names = cell.map(f => f.name).join(", ");
+        html += `<td>${names || "Ninguna"}</td>`;
+      } else if (typeof cell === 'object' && cell !== null) {
+        html += `<td><pre style="margin:0;">${JSON.stringify(cell)}</pre></td>`;
+      } else {
+        html += `<td>${cell}</td>`;
+      }
+    });
+    html += '</tr>';
+  });
+
+  html += '</tbody></table>';
+  resultsDiv.innerHTML = html;
+}
+
+
+  // Logout button
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    localStorage.removeItem('jwtToken');
+    window.location.href = '/index.html';
+  });
+  //put butttons
+  // PUT (Assign employee to franchise)
+  document.querySelector('.assign-btn').addEventListener('click', async () => {
+    const franchiseId = prompt("Enter Franchise ID:");
+    const employeeId = prompt("Enter Employee ID:");
+
+    if (!franchiseId || !employeeId) {
+      alert("Both Franchise ID and Employee ID are required.");
+      return;
+    }
+
+    const url = `/api/v1/franchises/${franchiseId}/employees/${employeeId}`;
+
+    try {
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
+      }
+
+      alert(`Employee ${employeeId} assigned to Franchise ${franchiseId} successfully.`);
+    } catch (error) {
+      alert("Failed to assign: " + error.message);
+    }
+  });
+  
+  // Add buttons
+  document.querySelectorAll('.add-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const role = btn.getAttribute('data-role');
+      const json = prompt(`Enter new ${role} data as JSON:`);
+      if (!json) return;
+
+      try {
+        const body = JSON.parse(json);
+        const res = await fetch(`/api/v1/${role}s`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(body)
+        });
+        if (!res.ok) throw new Error('Failed to add entry');
+        alert(`${role.charAt(0).toUpperCase() + role.slice(1)} added successfully`);
+      } catch (e) {
+        alert('Invalid JSON or error: ' + e.message);
+      }
+    });
+  });
+
+  // Delete buttons
+  document.querySelectorAll('.delete-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const role = btn.getAttribute('data-role');
+      const id = prompt(`Enter ID of ${role} to delete:`);
+      if (!id) return;
+
+      try {
+        const res = await fetch(`/api/v1/${role}s/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error('Delete failed');
+        alert(`${role.charAt(0).toUpperCase() + role.slice(1)} with ID ${id} deleted.`);
+      } catch (e) {
+        alert('ERROR and id :'+ role + id );
+        alert(e.message);
+      }
+    });
+  });
+});
+</script>
+
+</body>
+</html>

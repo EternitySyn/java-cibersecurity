@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login</title>
+  <style>
+    /* Reset and base */
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #333;
+    }
+
+    .login-container {
+      background: white;
+      padding: 2.5rem 3rem;
+      border-radius: 12px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+      width: 320px;
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 1.5rem;
+      color: #4a4a4a;
+      font-weight: 600;
+    }
+
+    form label {
+      display: block;
+      text-align: left;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: #555;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 0.55rem 0.75rem;
+      margin-bottom: 1.25rem;
+      border: 1.8px solid #ddd;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border-color 0.3s;
+    }
+
+    input[type="text"]:focus,
+    input[type="password"]:focus {
+      border-color: #667eea;
+      outline: none;
+      box-shadow: 0 0 8px #667eeaaa;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.75rem;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: white;
+      background: #667eea;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      margin-bottom: 1rem;
+    }
+
+    button:hover {
+      background: #5a6bd8;
+    }
+
+    /* GitHub OAuth button */
+    .github-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #24292e;
+      color: white;
+      font-weight: 600;
+      border-radius: 8px;
+      padding: 0.75rem;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 1.1rem;
+      transition: background-color 0.3s ease;
+      user-select: none;
+    }
+    .github-btn:hover {
+      background-color: #444c56;
+    }
+    .github-btn svg {
+      margin-right: 8px;
+      fill: white;
+      width: 20px;
+      height: 20px;
+    }
+
+    /* Responsive tweak */
+    @media (max-width: 400px) {
+      .login-container {
+        width: 90vw;
+        padding: 2rem 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h2>Login</h2>
+    <form id="loginForm" autocomplete="off" spellcheck="false">
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username" required autofocus />
+
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" required />
+
+      <button type="submit">Login</button>
+    </form>
+
+    <!-- GitHub OAuth button -->
+    <a href="/auth/github/callback" class="github-btn" aria-label="Login with GitHub">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          d="M12 0.297c-6.63 0-12 5.373-12 12 0 5.303 
+          3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 
+          0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61 
+          -.546-1.385-1.333-1.754-1.333-1.754-1.09-.744.083-.729.083-.729 
+          1.205.084 1.84 1.236 1.84 1.236 1.07 1.835 2.807 1.305 3.495.997 
+          .108-.776.418-1.305.76-1.605-2.665-.3-5.466-1.334-5.466-5.93 
+          0-1.31.47-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 
+          3.3 1.23a11.49 11.49 0 013-.405c1.02.005 2.045.138 3 .405 
+          2.28-1.552 3.285-1.23 3.285-1.23 .645 1.653.24 2.873.12 3.176 
+          .765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92 
+          .42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 
+          0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+      </svg>
+      Login with GitHub
+    </a>
+  </div>
+
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const form = event.target;
+      const data = {
+        username: form.username.value.trim(),
+        password: form.password.value
+      };
+
+      try {
+        const response = await fetch('/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          alert('Login failed: ' + errorText);
+          return;
+        }
+
+        const authResponse = await response.json();
+        const token = authResponse.jwt;
+        if (token) {
+          localStorage.setItem('jwtToken', token);
+          alert('Login successful!');
+          window.location.href = '/home.html';
+        } else {
+          alert('Login failed: No token received');
+        }
+      } catch (error) {
+        alert('Login error: ' + error.message);
+      }
+    });
+  </script>
+</body>
+</html>
+
+
